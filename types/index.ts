@@ -68,4 +68,9 @@ export type {
   DashboardNextAction,
   RecentAnalysisItem,
   DashboardSummary,
+
+  // ATS Compatibility
+  ATSCategoryScore,
+  ATSFinding,
+  ATSScoreResult,
 } from "./domain";

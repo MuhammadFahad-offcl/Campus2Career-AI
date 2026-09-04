@@ -1,0 +1,1 @@
+export { analyzeATSScore } from "./scoring";

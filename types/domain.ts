@@ -548,3 +548,42 @@ export interface DashboardSummary {
   nextAction: DashboardNextAction;
   recentAnalyses: RecentAnalysisItem[];
 }
+
+// ──────────────────────────────────────────────
+// ATS Compatibility Score
+// ──────────────────────────────────────────────
+
+/**
+ * Weighted categories that contribute to the overall ATS score.
+ * Each category is scored 0–100 independently and then combined
+ * using the weights defined in the scoring engine.
+ */
+export interface ATSCategoryScore {
+  name: string;
+  score: number;
+  weight: number;
+  weightedScore: number;
+}
+
+/**
+ * A single ATS finding — something the resume does well or could improve.
+ */
+export interface ATSFinding {
+  text: string;
+  category: string;
+}
+
+/**
+ * Complete ATS compatibility analysis result.
+ *
+ * The overall score is a deterministic weighted combination of
+ * category scores — never an arbitrary AI-generated number.
+ */
+export interface ATSScoreResult {
+  overall: number;
+  label: string;
+  description: string;
+  categories: ATSCategoryScore[];
+  strengths: ATSFinding[];
+  improvements: ATSFinding[];
+}

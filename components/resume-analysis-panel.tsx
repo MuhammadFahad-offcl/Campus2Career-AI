@@ -15,6 +15,7 @@ import {
   User,
 } from "lucide-react";
 import { analyzeResume, type AnalyzeResumeResult } from "@/app/actions/analyze-resume";
+import { ATSScorePanel } from "@/components/ats-score-panel";
 import type { CandidateProfile, Skill } from "@/types";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -448,6 +449,17 @@ export function ResumeAnalysisPanel() {
             </div>
           )}
           <CandidateProfileResults profile={result.profile} />
+
+          {/* ATS Compatibility Section */}
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">ATS Compatibility</h2>
+              <p className="text-xs text-muted-foreground">
+                Check how well your resume performs with Applicant Tracking Systems
+              </p>
+            </div>
+            <ATSScorePanel resumeId={resumeId} />
+          </section>
         </>
       )}
     </section>
