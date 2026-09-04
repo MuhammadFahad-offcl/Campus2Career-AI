@@ -108,7 +108,7 @@ export default async function DashboardPage() {
       <PageHeader description="Your AI career intelligence overview" />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
+        <div className="mx-auto max-w-5xl space-y-6 px-4 py-4 sm:px-6 sm:py-6">
           {result.status === "error" ? (
             <EmptyState
               icon={Target}

@@ -15,7 +15,7 @@ export default function SkillBridgePage() {
       />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl px-6 py-6">
+        <div className="mx-auto max-w-3xl px-4 py-4 sm:px-6 sm:py-6">
           <SkillBridgePanel />
         </div>
       </div>

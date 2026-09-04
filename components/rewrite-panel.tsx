@@ -147,7 +147,7 @@ export function RewritePanel() {
     <div className="space-y-5">
       {/* Restoring saved rewrite */}
       {restoring && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Loader2 className="size-6 animate-spin text-primary" />
           </div>
@@ -163,7 +163,7 @@ export function RewritePanel() {
 
       {/* Idle state — CTA to generate rewrite */}
       {!restoring && stage === "idle" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/30 bg-primary/5 px-8 py-12 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/30 bg-primary/5 px-4 py-8 sm:px-8 sm:py-12 text-center">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Wand2 className="size-6 text-primary" />
           </div>
@@ -191,7 +191,7 @@ export function RewritePanel() {
 
       {/* Generating state */}
       {stage === "generating" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Loader2 className="size-6 animate-spin text-primary" />
           </div>
@@ -270,7 +270,7 @@ export function RewritePanel() {
 
           {/* Global actions */}
           {pendingCount > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={handleAcceptAll}
                 className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
@@ -297,7 +297,7 @@ export function RewritePanel() {
 
           {/* Empty suggestions */}
           {suggestions.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-8 py-12 text-center">
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 sm:px-8 sm:py-12 text-center">
               <p className="text-sm font-medium text-foreground">
                 No suggestions generated
               </p>

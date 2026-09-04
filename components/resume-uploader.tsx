@@ -128,7 +128,7 @@ export function ResumeUploader({ className }: ResumeUploaderProps) {
 
       {/* ── Processing State ────────────────────────── */}
       {(stage === "uploading" || stage === "processing") && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 mb-4">
             <Loader2 className="size-6 text-primary animate-spin" />
           </div>

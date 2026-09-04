@@ -69,7 +69,7 @@ export function UploadZone({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-8 py-12 transition-all",
+          "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 sm:px-8 sm:py-12 transition-all",
           isDragging
             ? "border-primary bg-primary/5"
             : "border-border hover:border-primary/40 hover:bg-muted/50"

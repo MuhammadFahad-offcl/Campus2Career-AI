@@ -138,7 +138,7 @@ export function SkillBridgePanel() {
     <div className="space-y-5">
       {/* Loading state (checking for existing plan) */}
       {stage === "loading" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <Loader2 className="size-6 animate-spin text-primary" />
           <p className="mt-3 text-xs text-muted-foreground">
             Loading your skill bridge...
@@ -148,7 +148,7 @@ export function SkillBridgePanel() {
 
       {/* Idle state — CTA to generate plan */}
       {stage === "idle" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/30 bg-primary/5 px-8 py-12 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/30 bg-primary/5 px-4 py-8 sm:px-8 sm:py-12 text-center">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Sparkles className="size-6 text-primary" />
           </div>
@@ -175,7 +175,7 @@ export function SkillBridgePanel() {
 
       {/* Generating state */}
       {stage === "generating" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Loader2 className="size-6 animate-spin text-primary" />
           </div>

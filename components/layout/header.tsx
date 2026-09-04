@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Bell, Search } from "lucide-react";
 import { mainNav } from "@/lib/navigation";
+import { MobileMenuTrigger } from "@/components/layout/sidebar";
 
 function usePageTitle(): string {
   const pathname = usePathname();
@@ -26,23 +27,30 @@ interface PageHeaderProps {
  * Compact top header for dashboard pages.
  * Shows auto-detected page title, optional description, and action slot.
  * Includes notification bell on the right side.
+ *
+ * On mobile (< lg): Shows hamburger menu button and reduced horizontal padding.
+ * On desktop (≥ lg): Identical to before — no hamburger, full padding.
  */
 export function PageHeader({ title, description, children }: PageHeaderProps) {
   const autoTitle = usePageTitle();
 
   return (
-    <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-border bg-white px-6">
-      <div className="flex items-center gap-4">
-        <div>
-          <h1 className="text-[15px] font-semibold tracking-tight text-foreground leading-tight">
+    <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-border bg-white px-4 sm:px-6">
+      <div className="flex items-center gap-3 min-w-0">
+        {/* Mobile hamburger — hidden at lg+ */}
+        <MobileMenuTrigger />
+        <div className="min-w-0">
+          <h1 className="text-[15px] font-semibold tracking-tight text-foreground leading-tight truncate">
             {title ?? autoTitle}
           </h1>
           {description && (
-            <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground truncate hidden sm:block">
+              {description}
+            </p>
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         {children}
         <button
           className="relative flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -52,7 +60,7 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
           <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-primary ring-2 ring-white" />
         </button>
         <button
-          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="hidden sm:flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Search"
         >
           <Search className="size-4" />

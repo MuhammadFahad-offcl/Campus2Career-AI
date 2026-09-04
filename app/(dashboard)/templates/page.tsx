@@ -15,7 +15,7 @@ export default function TemplatesPage() {
         description="Resume templates optimized for ATS and hiring managers"
       />
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mx-auto max-w-3xl">
           <EmptyState
             icon={LayoutTemplate}

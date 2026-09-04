@@ -15,7 +15,7 @@ export default function ResumesPage() {
         description="Manage your uploaded and analyzed resumes"
       />
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mx-auto max-w-3xl">
           <EmptyState
             icon={FolderOpen}

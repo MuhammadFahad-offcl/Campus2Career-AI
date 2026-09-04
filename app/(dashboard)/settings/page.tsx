@@ -17,7 +17,7 @@ export default function SettingsPage() {
       />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-2xl px-6 py-6 space-y-5">
+        <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6 sm:py-6 space-y-5">
           {/* Profile */}
           <SectionCard title="Profile" description="Your account information">
             <div className="flex items-center gap-4">

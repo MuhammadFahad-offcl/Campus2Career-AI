@@ -417,7 +417,7 @@ export function JobAnalysisPanel() {
 
       {/* Restoring saved analysis */}
       {restoring && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Loader2 className="size-6 animate-spin text-primary" />
           </div>
@@ -432,7 +432,7 @@ export function JobAnalysisPanel() {
 
       {/* Processing State */}
       {stage === "analyzing" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <Loader2 className="size-6 animate-spin text-primary" />
           </div>
@@ -470,7 +470,7 @@ export function JobAnalysisPanel() {
           {/* Match Analysis CTA + Results */}
           <div className="space-y-4">
             {matchStage === "idle" && (
-              <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-primary/30 bg-primary/5 px-8 py-8 text-center">
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-primary/30 bg-primary/5 px-4 py-6 sm:px-8 sm:py-8 text-center">
                 <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10">
                   <Sparkles className="size-5 text-primary" />
                 </div>
@@ -494,7 +494,7 @@ export function JobAnalysisPanel() {
             )}
 
             {matchStage === "computing" && (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-8 py-12">
+              <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card px-4 py-8 sm:px-8 sm:py-12">
                 <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
                   <Loader2 className="size-6 animate-spin text-primary" />
                 </div>
@@ -545,7 +545,7 @@ export function JobAnalysisPanel() {
 
       {/* Empty state */}
       {!restoring && stage === "idle" && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-8 py-12 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 sm:px-8 sm:py-12 text-center">
           <div className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-muted">
             <Briefcase className="size-5 text-muted-foreground" />
           </div>
