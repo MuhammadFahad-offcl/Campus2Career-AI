@@ -50,3 +50,6 @@ e2e-shots/
 
 # Supabase local CLI state
 supabase/.temp/
+
+# Claude desktop app output drops (SendUserFile artifacts, not project source)
+Claude outputs/
