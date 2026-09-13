@@ -33,7 +33,7 @@ export function ProgressBar({
         )}
       >
         <div
-          className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+          className="h-full rounded-full gradient-primary transition-all duration-500 ease-out"
           style={{ width: `${clamped}%` }}
         />
       </div>

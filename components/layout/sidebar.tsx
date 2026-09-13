@@ -133,7 +133,7 @@ function SidebarContent() {
     <aside className="flex h-full w-[260px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       {/* Brand */}
       <div className="flex h-[60px] items-center gap-2.5 border-b border-sidebar-border px-5">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary shadow-sm">
+        <div className="flex size-8 items-center justify-center rounded-lg gradient-primary shadow-glow-primary">
           <Zap className="size-4 text-primary-foreground" />
         </div>
         <div className="flex flex-col flex-1 min-w-0">
@@ -174,7 +174,7 @@ function SidebarContent() {
       <div className="border-t border-sidebar-border p-3">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/60">
           <Avatar className="size-8">
-            <AvatarFallback className="bg-primary/10 text-[11px] font-bold text-primary">
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/15 text-[11px] font-bold text-primary">
               SC
             </AvatarFallback>
           </Avatar>

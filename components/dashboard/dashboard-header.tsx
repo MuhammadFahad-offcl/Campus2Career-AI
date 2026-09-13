@@ -25,8 +25,9 @@ export function DashboardHeader({ summary }: { summary: DashboardSummary }) {
     readinessTone[summary.readiness] ?? "border-primary/20 bg-primary/5 text-primary";
 
   return (
-    <section>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/8 via-accent/5 to-transparent p-5 ring-1 ring-primary/10 sm:p-6">
+      <div className="mesh-blob -right-10 -top-14 size-40 bg-accent/25" aria-hidden="true" />
+      <div className="relative flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-foreground">
             {getGreeting()}
@@ -38,7 +39,7 @@ export function DashboardHeader({ summary }: { summary: DashboardSummary }) {
         </div>
         <span
           className={cn(
-            "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+            "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium shadow-sm",
             tone
           )}
         >
@@ -47,7 +48,7 @@ export function DashboardHeader({ summary }: { summary: DashboardSummary }) {
       </div>
 
       {summary.targetRole && (
-        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+        <div className="relative mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
           <Target className="size-3.5 shrink-0 text-primary/70" />
           <span className="font-medium text-foreground">
             {summary.targetRole.title}

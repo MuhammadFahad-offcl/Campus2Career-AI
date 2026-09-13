@@ -49,11 +49,11 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-4 py-10 sm:px-8 sm:py-16 text-center",
+        "flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-gradient-to-b from-muted/40 to-muted/10 px-4 py-10 sm:px-8 sm:py-16 text-center",
         className
       )}
     >
-      <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/8">
+      <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 shadow-sm">
         <Icon className="size-6 text-primary" />
       </div>
       <h3 className="mb-1.5 text-base font-semibold text-foreground">{title}</h3>

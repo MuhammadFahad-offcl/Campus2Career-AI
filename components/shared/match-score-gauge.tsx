@@ -19,6 +19,12 @@ function getScoreRingColor(score: number): string {
   return "stroke-red-400";
 }
 
+function getScoreGlow(score: number): string {
+  if (score >= 75) return "drop-shadow-[0_0_6px_oklch(0.72_0.19_150/0.45)]";
+  if (score >= 50) return "drop-shadow-[0_0_6px_oklch(0.77_0.17_70/0.45)]";
+  return "drop-shadow-[0_0_6px_oklch(0.7_0.19_25/0.4)]";
+}
+
 /**
  * A circular gauge that visualizes a match score from 0-100.
  * Used in job matching and resume analysis views.
@@ -66,7 +72,11 @@ export function MatchScoreGauge({ score, size = "default", label, className }: M
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className={cn("transition-all duration-700 ease-out", getScoreRingColor(clampedScore))}
+            className={cn(
+              "transition-all duration-700 ease-out",
+              getScoreRingColor(clampedScore),
+              getScoreGlow(clampedScore)
+            )}
           />
         </svg>
         <span className={cn("absolute font-bold tracking-tight", s.fontSize, getScoreColor(clampedScore))}>

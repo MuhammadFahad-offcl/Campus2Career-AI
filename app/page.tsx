@@ -11,6 +11,7 @@ import {
   Upload,
   ScanLine,
   BarChart3,
+  MessagesSquare,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -69,6 +70,12 @@ const features = [
     description: "Personalized daily learning plans to close your most critical skill gaps in one week.",
     active: true,
   },
+  {
+    icon: MessagesSquare,
+    title: "AI Mock Interviewer",
+    description: "A conversational practice interview grounded in your resume and target role, with a readiness score and follow-up questions.",
+    active: true,
+  },
 ] as const;
 
 export default function LandingPage() {
@@ -78,7 +85,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-primary">
+            <div className="flex size-7 items-center justify-center rounded-lg gradient-primary shadow-glow-primary">
               <Zap className="size-3.5 text-primary-foreground" />
             </div>
             <span className="text-sm font-bold tracking-tight">Campus2Career AI</span>
@@ -101,9 +108,14 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-6xl px-6 pb-16 pt-20 lg:pb-24 lg:pt-28">
+        {/* Gradient mesh background — decorative only, canvas stays white */}
+        <div className="mesh-blob -top-24 left-1/4 size-72 bg-primary/25" aria-hidden="true" />
+        <div className="mesh-blob top-10 right-1/4 size-80 bg-accent/20" aria-hidden="true" />
+        <div className="mesh-blob top-40 left-1/2 size-64 -translate-x-1/2 bg-primary/10" aria-hidden="true" />
+
+        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-20 lg:pb-24 lg:pt-28">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="secondary" className="mb-5 text-[11px] font-medium px-3">
+            <Badge variant="secondary" className="mb-5 text-[11px] font-medium px-3 shadow-sm ring-1 ring-primary/10">
               AI Career Intelligence for Students & Graduates
             </Badge>
             <h1 className="mb-5 text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
@@ -143,7 +155,8 @@ export default function LandingPage() {
           <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">
             See it in action
           </p>
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.04)] lg:p-8">
+          <div className="relative rounded-2xl bg-gradient-to-b from-primary/15 via-accent/10 to-transparent p-px shadow-elevated">
+            <div className="rounded-[calc(1rem-1px)] bg-white p-6 lg:p-8">
             <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
               {/* Left: Match Score */}
               <div className="flex flex-col items-center justify-center rounded-xl bg-muted/50 p-6">
@@ -220,6 +233,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+            </div>
           </div>
         </div>
       </section>
@@ -241,7 +255,7 @@ export default function LandingPage() {
               return (
                 <div key={step.number} className="relative">
                   <div className="mb-4 flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/10 shadow-sm">
                       <Icon className="size-5 text-primary" />
                     </div>
                     <span className="text-xs font-bold text-muted-foreground/40 tracking-wider">{step.number}</span>
@@ -266,17 +280,16 @@ export default function LandingPage() {
               Everything you need to go from student to hired, powered by AI.
             </p>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <Card key={feature.title} className={cn(
-                  "transition-all duration-200 hover:shadow-sm",
+                <Card key={feature.title} interactive className={cn(
                   !feature.active && "opacity-70"
                 )}>
                   <CardHeader>
                     <div className="mb-3 flex items-center gap-3">
-                      <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+                      <div className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-accent/10 shadow-sm">
                         <Icon className="size-4.5 text-primary" />
                       </div>
                       <CardTitle className="text-[15px]">{feature.title}</CardTitle>
@@ -299,20 +312,24 @@ export default function LandingPage() {
 
       {/* Final CTA */}
       <section className="px-6 py-16 lg:py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-3 text-2xl font-bold tracking-tight">
-            Ready to understand your career gap?
-          </h2>
-          <p className="mb-8 text-sm text-muted-foreground">
-            Upload your resume and get your first analysis in under 60 seconds.
-          </p>
-          <Link
-            href="/analysis"
-            className={cn(buttonVariants({ size: "lg" }), "text-sm px-8 h-11")}
-          >
-            Get Started Free
-            <ChevronRight className="size-4" />
-          </Link>
+        <div className="relative mx-auto max-w-3xl overflow-hidden rounded-3xl bg-gradient-to-br from-primary/8 via-accent/5 to-transparent px-6 py-14 text-center ring-1 ring-primary/10 sm:px-12">
+          <div className="mesh-blob -top-16 right-0 size-56 bg-accent/20" aria-hidden="true" />
+          <div className="mesh-blob -bottom-16 left-0 size-56 bg-primary/15" aria-hidden="true" />
+          <div className="relative">
+            <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">
+              Ready to understand your career gap?
+            </h2>
+            <p className="mb-8 text-sm text-muted-foreground">
+              Upload your resume and get your first analysis in under 60 seconds.
+            </p>
+            <Link
+              href="/analysis"
+              className={cn(buttonVariants({ size: "lg" }), "text-sm px-8 h-11")}
+            >
+              Get Started Free
+              <ChevronRight className="size-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -320,7 +337,7 @@ export default function LandingPage() {
       <footer className="border-t border-border px-6 py-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-5 items-center justify-center rounded-md bg-primary">
+            <div className="flex size-5 items-center justify-center rounded-md gradient-primary">
               <Zap className="size-2.5 text-primary-foreground" />
             </div>
             <span className="text-xs font-medium text-muted-foreground">

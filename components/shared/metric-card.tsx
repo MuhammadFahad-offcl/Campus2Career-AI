@@ -18,11 +18,11 @@ interface MetricCardProps {
 }
 
 const accentMap = {
-  default: "bg-muted text-muted-foreground",
-  indigo: "bg-primary/10 text-primary",
-  purple: "bg-accent/10 text-accent",
-  green: "bg-emerald-50 text-emerald-600",
-  amber: "bg-amber-50 text-amber-600",
+  default: "bg-gradient-to-br from-muted to-muted/40 text-muted-foreground",
+  indigo: "bg-gradient-to-br from-primary/20 to-primary/5 text-primary",
+  purple: "bg-gradient-to-br from-accent/20 to-accent/5 text-accent",
+  green: "bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600",
+  amber: "bg-gradient-to-br from-amber-100 to-amber-50 text-amber-600",
 } as const;
 
 /**
@@ -39,11 +39,11 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   return (
-    <Card className={cn("transition-colors hover:border-primary/20", className)}>
+    <Card className={cn("transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevated hover:ring-primary/15", className)}>
       <CardHeader className="flex-row items-center gap-3 pb-0">
         <div
           className={cn(
-            "flex size-9 items-center justify-center rounded-lg",
+            "flex size-9 items-center justify-center rounded-lg shadow-sm",
             accentMap[accent]
           )}
         >
