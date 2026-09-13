@@ -9,9 +9,11 @@
 
 import type {
   DashboardGap,
+  DashboardInterview,
   DashboardNextAction,
   DashboardSkillBridge,
   DashboardSkillSnapshot,
+  InterviewSessionStatus,
   MatchScore,
   ReadinessState,
   SkillBridgePlan,
@@ -122,6 +124,34 @@ export function buildSkillBridgeSummary(
     currentDayTitle: current?.title ?? null,
     currentDayTask: current?.task ?? null,
     currentDayEvidence: current?.expectedEvidence ?? null,
+  };
+}
+
+// ──────────────────────────────────────────────
+// Mock Interview summary
+// ──────────────────────────────────────────────
+
+/**
+ * Summarize the latest persisted interview session for the dashboard —
+ * "Last Interview" and its top practice recommendation. Truthful:
+ * a non-completed (in-progress/abandoned) session still shows here so
+ * the candidate can see status, but never carries a fabricated score.
+ */
+export function buildInterviewSummary(row: {
+  id: string;
+  status: InterviewSessionStatus;
+  overallScore: number | null;
+  recommendedPractice: string[];
+  completedAt: string | null;
+  jobTitle: string;
+}): DashboardInterview {
+  return {
+    sessionId: row.id,
+    status: row.status,
+    jobTitle: row.jobTitle,
+    overallScore: row.overallScore,
+    topRecommendation: row.recommendedPractice[0] ?? null,
+    completedAt: row.completedAt,
   };
 }
 

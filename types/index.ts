@@ -56,6 +56,19 @@ export type {
   SkillBridgeDay,
   SkillBridgePlan,
 
+  // Mock Interviewer
+  InterviewType,
+  InterviewDifficulty,
+  InterviewQuestionCount,
+  InterviewQuestionCategory,
+  InterviewSessionStatus,
+  InterviewEvaluation,
+  InterviewQuestion,
+  InterviewScoreBreakdown,
+  InterviewSession,
+  InterviewSetupContext,
+  DashboardInterview,
+
   // Dashboard
   ReadinessState,
   DashboardTargetRole,

@@ -544,9 +544,143 @@ export interface DashboardSummary {
   skills: DashboardSkillSnapshot | null;
   rewrite: DashboardRewrite | null;
   skillBridge: DashboardSkillBridge | null;
+  interview: DashboardInterview | null;
   readiness: ReadinessState;
   nextAction: DashboardNextAction;
   recentAnalyses: RecentAnalysisItem[];
+}
+
+// ──────────────────────────────────────────────
+// Mock Interviewer — Feature 6 ("Practice" stage)
+//
+// Integrates Resume Analyzer → Profile → Job Match → Skill Gap
+// Analysis into a personalized, conversational mock interview.
+// The AI only ever proposes question text, category, targetSkill,
+// per-answer evaluation numbers, and closing narrative text — every
+// other piece of session state (numbering, the question-count cap,
+// score aggregation, skill-gap correlation) is deterministic
+// (lib/interview/session-utils.ts).
+// ──────────────────────────────────────────────
+
+export type InterviewType = "technical" | "behavioral" | "hr" | "mixed";
+
+export type InterviewDifficulty = "beginner" | "intermediate" | "advanced";
+
+export type InterviewQuestionCount = 5 | 10 | 15;
+
+export type InterviewQuestionCategory =
+  | "technical"
+  | "behavioral"
+  | "hr"
+  | "problem_solving";
+
+export type InterviewSessionStatus = "in_progress" | "completed" | "abandoned";
+
+/**
+ * Per-answer evaluation. Never shown intrusively turn-by-turn — stored
+ * for deterministic aggregation and the final report only.
+ */
+export interface InterviewEvaluation {
+  relevance: number;
+  clarity: number;
+  technicalAccuracy: number;
+  depth: number;
+  communication: number;
+  evidenceScore: number;
+  /** True only when the answer asserts something the candidate's
+   *  profile evidence does not support — flagged, never rejected. */
+  unsupportedClaim: boolean;
+  unsupportedClaimNote?: string;
+}
+
+/**
+ * One question (main or follow-up) in the conversational transcript.
+ * The full transcript is stored as a single JSONB array — see
+ * supabase/migrations/008_create_interview_sessions.sql.
+ */
+export interface InterviewQuestion {
+  /** Sequence number across the whole session, main + follow-up. */
+  number: number;
+  category: InterviewQuestionCategory;
+  question: string;
+  isFollowUp: boolean;
+  /** AI-proposed, app-validated — must match a real job requirement
+   *  or skill gap (see sanitizeTargetSkill). */
+  targetSkill?: string;
+  askedAt: string;
+  answer?: string;
+  answeredAt?: string;
+  evaluation?: InterviewEvaluation;
+}
+
+/**
+ * Deterministic 5-category score breakdown for the final report.
+ */
+export interface InterviewScoreBreakdown {
+  technical: number;
+  communication: number;
+  relevance: number;
+  problemSolving: number;
+  behavioral: number;
+}
+
+/**
+ * A complete mock interview session — one per attempt (insert, not
+ * upsert; a candidate may retake the same analysis).
+ */
+export interface InterviewSession {
+  id: string;
+  resumeId: string;
+  jobTargetId: string;
+  analysisId: string;
+  interviewType: InterviewType;
+  difficulty: InterviewDifficulty;
+  questionCount: InterviewQuestionCount;
+  status: InterviewSessionStatus;
+  focusAreas: string[];
+  questions: InterviewQuestion[];
+  overallScore: number | null;
+  scoreBreakdown: InterviewScoreBreakdown | null;
+  strengths: string[];
+  improvements: string[];
+  recommendedPractice: string[];
+  /** Deterministic join against the analysis's missing skill gaps —
+   *  never an AI assertion. See correlateWithSkillGaps. */
+  relatedSkillGaps: string[];
+  model?: string;
+  startedAt: string;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Setup-screen context assembled from EXISTING product state (latest
+ * match analysis + its job target) — no AI call, and the user is
+ * never asked to re-enter data the app already has.
+ */
+export interface InterviewSetupContext {
+  resumeId: string;
+  jobTargetId: string;
+  analysisId: string;
+  jobTitle: string;
+  jobCompany: string;
+  matchScore: number;
+  suggestedFocusAreas: string[];
+}
+
+/**
+ * Dashboard "Mock Interview" row — summarizes the latest persisted
+ * session. Truthful: a non-completed session still surfaces status,
+ * but never a fabricated score.
+ */
+export interface DashboardInterview {
+  sessionId: string;
+  status: InterviewSessionStatus;
+  jobTitle: string;
+  overallScore: number | null;
+  topRecommendation: string | null;
+  completedAt: string | null;
 }
 
 // ──────────────────────────────────────────────

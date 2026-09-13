@@ -6,18 +6,21 @@ import { getAnonymousSessionId } from "@/lib/anonymous-session";
 import { type ResumeOwner } from "@/lib/resume-ownership";
 import { candidateProfileSchema } from "@/schemas";
 import type {
+  DashboardInterview,
   DashboardMatch,
   DashboardRewrite,
   DashboardSkillBridge,
   DashboardSkillSnapshot,
   DashboardSummary,
   DashboardTargetRole,
+  InterviewSessionStatus,
   MatchScore,
   RecentAnalysisItem,
   SkillBridgeDay,
   SkillGap,
 } from "@/types";
 import {
+  buildInterviewSummary,
   buildSkillBridgeSummary,
   buildSkillSnapshot,
   deriveNextAction,
@@ -134,7 +137,7 @@ export async function getDashboardSummary(): Promise<DashboardResult> {
   const { owner, supabase } = context;
 
   // ── Parallel owner-filtered reads ───────
-  const [resumeRows, analysisRows, rewriteRows, bridgeRows, recentRows, jobTargetRows] =
+  const [resumeRows, analysisRows, rewriteRows, bridgeRows, interviewRows, recentRows, jobTargetRows] =
     await Promise.all([
       safeQuery("resume", () =>
         applyOwnerFilter(
@@ -178,6 +181,17 @@ export async function getDashboardSummary(): Promise<DashboardResult> {
           owner
         )
       ),
+      safeQuery("mock interview", () =>
+        applyOwnerFilter(
+          supabase
+            .from("interview_sessions")
+            .select("id, job_target_id, status, overall_score, recommended_practice, completed_at")
+            .eq("status", "completed")
+            .order("completed_at", { ascending: false })
+            .limit(1),
+          owner
+        )
+      ),
       safeQuery("recent analyses", () =>
         applyOwnerFilter(
           supabase
@@ -209,13 +223,15 @@ export async function getDashboardSummary(): Promise<DashboardResult> {
   const analysis = analysisRows?.[0] ?? null;
   const rewrite = rewriteRows?.[0] ?? null;
   const bridge = bridgeRows?.[0] ?? null;
+  const interview = interviewRows?.[0] ?? null;
   const recent = recentRows ?? [];
 
-  // ── Job titles for latest + recent analyses (one batched query) ───────
+  // ── Job titles for latest + recent analyses + latest interview (one batched query) ───────
   const jobTargetIds = Array.from(
     new Set(
       [
         analysis?.job_target_id as string | undefined,
+        interview?.job_target_id as string | undefined,
         ...recent.map((r) => r.job_target_id as string | undefined),
       ].filter((id): id is string => Boolean(id))
     )
@@ -309,6 +325,20 @@ export async function getDashboardSummary(): Promise<DashboardResult> {
     });
   }
 
+  let interviewSummary: DashboardInterview | null = null;
+  if (interview) {
+    const jobTargetId = interview.job_target_id as string | null;
+    const job = jobTargetId ? jobTitleMap.get(jobTargetId) : undefined;
+    interviewSummary = buildInterviewSummary({
+      id: interview.id as string,
+      status: interview.status as InterviewSessionStatus,
+      overallScore: (interview.overall_score as number | null) ?? null,
+      recommendedPractice: (interview.recommended_practice as string[]) ?? [],
+      completedAt: (interview.completed_at as string | null) ?? null,
+      jobTitle: job?.title ?? "Target role",
+    });
+  }
+
   const recentAnalyses: RecentAnalysisItem[] = recent.map((row) => {
     const jobTargetId = row.job_target_id as string | null;
     const job = jobTargetId ? jobTitleMap.get(jobTargetId) : undefined;
@@ -344,6 +374,7 @@ export async function getDashboardSummary(): Promise<DashboardResult> {
     skills,
     rewrite: rewriteSummary,
     skillBridge: skillBridgeSummary,
+    interview: interviewSummary,
     readiness: deriveReadinessState(readinessInput),
     nextAction: deriveNextAction({
       ...readinessInput,
@@ -380,6 +411,7 @@ function buildEmptySummary(): DashboardSummary {
     skills: null,
     rewrite: null,
     skillBridge: null,
+    interview: null,
     readiness: deriveReadinessState(readinessInput),
     nextAction: deriveNextAction({ ...readinessInput, currentDay: null }),
     recentAnalyses: [],

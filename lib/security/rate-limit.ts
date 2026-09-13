@@ -110,4 +110,6 @@ export const RATE_LIMITS = {
   computeMatch: { maxRequests: 5, windowMs: 60_000 } as RateLimitConfig,
   rewrite: { maxRequests: 3, windowMs: 60_000 } as RateLimitConfig,
   skillBridge: { maxRequests: 3, windowMs: 60_000 } as RateLimitConfig,
+  mockInterviewStart: { maxRequests: 3, windowMs: 60_000 } as RateLimitConfig,
+  mockInterviewTurn: { maxRequests: 20, windowMs: 60_000 } as RateLimitConfig,
 } as const;

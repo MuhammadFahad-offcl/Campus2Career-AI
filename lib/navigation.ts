@@ -14,6 +14,7 @@ import {
   FolderOpen,
   Target,
   LayoutTemplate,
+  MessagesSquare,
   type LucideIcon,
 } from "lucide-react";
 
@@ -70,6 +71,11 @@ export const mainNav: NavGroup[] = [
         label: "Skill Bridge",
         href: "/skill-bridge",
         icon: Sparkles,
+      },
+      {
+        label: "Mock Interview",
+        href: "/mock-interview",
+        icon: MessagesSquare,
       },
     ],
   },

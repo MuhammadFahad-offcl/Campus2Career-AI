@@ -480,6 +480,135 @@ export const skillBridgePlanSchema = z.object({
 });
 
 // ──────────────────────────────────────────────
+// Mock Interviewer Schemas — Feature 6 ("Practice" stage)
+// ──────────────────────────────────────────────
+
+export const interviewTypeSchema = z.enum(["technical", "behavioral", "hr", "mixed"]);
+
+export const interviewDifficultySchema = z.enum(["beginner", "intermediate", "advanced"]);
+
+export const interviewQuestionCountSchema = z.union([
+  z.literal(5),
+  z.literal(10),
+  z.literal(15),
+]);
+
+export const interviewQuestionCategorySchema = z.enum([
+  "technical",
+  "behavioral",
+  "hr",
+  "problem_solving",
+]);
+
+export const interviewSessionStatusSchema = z.enum([
+  "in_progress",
+  "completed",
+  "abandoned",
+]);
+
+/**
+ * Per-answer evaluation. Persisted schema — always present once an
+ * answer has been evaluated.
+ */
+export const interviewEvaluationSchema = z.object({
+  relevance: z.number().min(0).max(100),
+  clarity: z.number().min(0).max(100),
+  technicalAccuracy: z.number().min(0).max(100),
+  depth: z.number().min(0).max(100),
+  communication: z.number().min(0).max(100),
+  evidenceScore: z.number().min(0).max(100),
+  unsupportedClaim: z.boolean().default(false),
+  unsupportedClaimNote: z.string().max(500).optional(),
+});
+
+/**
+ * Schema for validating the AI's raw per-turn output before the
+ * deterministic overrides in lib/ai/mock-interviewer.ts are applied.
+ * Tolerant: category/targetSkill are re-validated app-side afterward
+ * (coerceCategory / sanitizeTargetSkill), so this layer stays loose.
+ */
+export const aiInterviewTurnOutputSchema = z.object({
+  evaluation: interviewEvaluationSchema.nullable().default(null),
+  nextAction: z.enum(["follow_up", "next_question", "complete"]),
+  nextQuestion: z
+    .object({
+      question: z.string().min(1).max(1000),
+      category: interviewQuestionCategorySchema,
+      targetSkill: z.string().max(200).optional(),
+    })
+    .nullable()
+    .default(null),
+});
+
+export type AIInterviewTurnOutput = z.output<typeof aiInterviewTurnOutputSchema>;
+
+/**
+ * Schema for validating the AI's closing-report output (text only —
+ * scores are computed deterministically before this call).
+ */
+export const aiInterviewReportOutputSchema = z.object({
+  strengths: z.array(z.string().max(500)).default([]),
+  improvements: z.array(z.string().max(500)).default([]),
+  recommendedPractice: z.array(z.string().max(500)).default([]),
+});
+
+export type AIInterviewReportOutput = z.output<typeof aiInterviewReportOutputSchema>;
+
+/**
+ * A single question (main or follow-up) in the persisted transcript.
+ */
+export const interviewQuestionSchema = z.object({
+  number: z.number().int().min(1),
+  category: interviewQuestionCategorySchema,
+  question: z.string().min(1).max(1000),
+  isFollowUp: z.boolean().default(false),
+  targetSkill: z.string().max(200).optional(),
+  askedAt: z.string().datetime({ offset: true }),
+  answer: z.string().max(5000).optional(),
+  answeredAt: z.string().datetime({ offset: true }).optional(),
+  evaluation: interviewEvaluationSchema.optional(),
+});
+
+export const interviewScoreBreakdownSchema = z.object({
+  technical: z.number().min(0).max(100),
+  communication: z.number().min(0).max(100),
+  relevance: z.number().min(0).max(100),
+  problemSolving: z.number().min(0).max(100),
+  behavioral: z.number().min(0).max(100),
+});
+
+/**
+ * Full persisted InterviewSession schema.
+ *
+ * Timestamps use `offset: true` for the same reason as
+ * skillBridgePlanSchema — Supabase serializes TIMESTAMPTZ with a
+ * numeric offset, not the `Z` designator `.datetime()` expects.
+ */
+export const interviewSessionSchema = z.object({
+  id: z.string().uuid(),
+  resumeId: z.string().uuid(),
+  jobTargetId: z.string().uuid(),
+  analysisId: z.string().uuid(),
+  interviewType: interviewTypeSchema,
+  difficulty: interviewDifficultySchema,
+  questionCount: interviewQuestionCountSchema,
+  status: interviewSessionStatusSchema,
+  focusAreas: z.array(z.string()).default([]),
+  questions: z.array(interviewQuestionSchema).default([]),
+  overallScore: z.number().min(0).max(100).nullable().default(null),
+  scoreBreakdown: interviewScoreBreakdownSchema.nullable().default(null),
+  strengths: z.array(z.string()).default([]),
+  improvements: z.array(z.string()).default([]),
+  recommendedPractice: z.array(z.string()).default([]),
+  relatedSkillGaps: z.array(z.string()).default([]),
+  model: z.string().max(100).optional(),
+  startedAt: z.string().datetime({ offset: true }),
+  completedAt: z.string().datetime({ offset: true }).nullable().default(null),
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+});
+
+// ──────────────────────────────────────────────
 // File Upload Input
 // ──────────────────────────────────────────────
 

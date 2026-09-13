@@ -54,7 +54,7 @@ The dashboard uses stored data and deterministic calculations — no additional 
 ## Product Flow
 
 ```text
-Analyze → Compare → Improve → Build → Apply
+Understand → Compare → Improve → Build → Apply → Practice
 ```
 
 1. Upload your resume
@@ -64,7 +64,8 @@ Analyze → Compare → Improve → Build → Apply
 5. Identify gaps
 6. Improve your resume with evidence-aware rewrite suggestions
 7. Follow your personalized 7-day Skill Bridge
-8. Track progress and apply
+8. Practice with a personalized AI mock interview
+9. Track progress and apply
 
 ---
 

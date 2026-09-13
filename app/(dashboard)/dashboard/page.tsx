@@ -7,6 +7,7 @@ import {
   MatchOverviewCard,
   SkillGapsCard,
   SkillBridgeCard,
+  MockInterviewCard,
   RewriteCard,
   NextActionCard,
   RecentAnalysesCard,
@@ -146,6 +147,12 @@ export default async function DashboardPage() {
                   <SkillBridgeCard bridge={result.summary.skillBridge} />
                   <RewriteCard rewrite={result.summary.rewrite} />
                 </div>
+              </section>
+
+              {/* ─── Practice ─── */}
+              <section>
+                <SectionLabel>Practice</SectionLabel>
+                <MockInterviewCard interview={result.summary.interview} />
               </section>
 
               <NextActionCard action={result.summary.nextAction} />
