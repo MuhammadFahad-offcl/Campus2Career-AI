@@ -10,18 +10,25 @@ import {
   Target,
   Wand2,
   CheckCheck,
+  FileEdit,
 } from "lucide-react";
 import {
   generateRewrite,
   getLatestRewrite,
   type GenerateRewriteResult,
 } from "@/app/actions/generate-rewrite";
+import {
+  buildRewrittenResume,
+  type BuildRewrittenResumeSuccess,
+} from "@/app/actions/build-rewritten-resume";
 import type { RewriteSuggestion } from "@/types";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { RewriteSuggestionCard } from "@/components/rewrite-suggestion-card";
+import { RewrittenResumeView } from "@/components/rewritten-resume-view";
 
 type RewriteStage = "idle" | "generating" | "success" | "error";
+type AutoRewriteStage = "idle" | "building" | "error";
 
 export function RewritePanel() {
   const [stage, setStage] = useState<RewriteStage>("idle");
@@ -30,6 +37,13 @@ export function RewritePanel() {
   const [errorMessage, setErrorMessage] = useState("");
   const [restoring, setRestoring] = useState(true);
   const [restored, setRestored] = useState(false);
+
+  // Auto-Rewrite Full Resume — applies accepted/edited suggestions onto the
+  // stored profile (no new AI call) and shows a downloadable, tailored
+  // resume so the user doesn't have to copy-paste each suggestion by hand.
+  const [autoRewriteStage, setAutoRewriteStage] = useState<AutoRewriteStage>("idle");
+  const [autoRewriteError, setAutoRewriteError] = useState("");
+  const [autoRewrite, setAutoRewrite] = useState<BuildRewrittenResumeSuccess | null>(null);
 
   // Synchronous double-submit guard: the Regenerate button stays mounted
   // while a generation runs — a second click must not enqueue a second AI
@@ -79,6 +93,9 @@ export function RewritePanel() {
     setSuggestions([]);
     setErrorMessage("");
     setRestored(false);
+    setAutoRewrite(null);
+    setAutoRewriteStage("idle");
+    setAutoRewriteError("");
 
     try {
       const response = await generateRewrite();
@@ -135,7 +152,33 @@ export function RewritePanel() {
     if (result?.status === "success") {
       setSuggestions(result.suggestions);
     }
+    setAutoRewrite(null);
+    setAutoRewriteStage("idle");
+    setAutoRewriteError("");
   }, [result]);
+
+  const handleAutoRewrite = useCallback(async () => {
+    if (result?.status !== "success") return;
+
+    setAutoRewriteStage("building");
+    setAutoRewriteError("");
+
+    try {
+      const response = await buildRewrittenResume(result.resumeId, suggestions);
+      if (response.status === "success") {
+        setAutoRewrite(response);
+        setAutoRewriteStage("idle");
+      } else {
+        setAutoRewriteStage("error");
+        setAutoRewriteError(response.error);
+      }
+    } catch {
+      setAutoRewriteStage("error");
+      setAutoRewriteError(
+        "An unexpected error occurred while building the rewritten resume."
+      );
+    }
+  }, [result, suggestions]);
 
   const pendingCount = suggestions.filter((s) => s.status === "pending").length;
   const acceptedCount = suggestions.filter(
@@ -267,6 +310,48 @@ export function RewritePanel() {
               </span>
             </div>
           </div>
+
+          {/* Auto-Rewrite Full Resume */}
+          {acceptedCount > 0 && (
+            <div className="flex flex-col gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-foreground">
+                <span className="font-medium">
+                  {acceptedCount} suggestion{acceptedCount !== 1 ? "s" : ""} ready to apply.
+                </span>{" "}
+                Skip the manual copy-paste — generate the complete rewritten resume.
+              </p>
+              <button
+                onClick={handleAutoRewrite}
+                disabled={autoRewriteStage === "building"}
+                className={cn(buttonVariants({ size: "sm" }), "shrink-0 text-xs")}
+              >
+                {autoRewriteStage === "building" ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <FileEdit className="size-3.5" />
+                )}
+                {autoRewrite ? "Regenerate Rewritten Resume" : "Auto-Rewrite Full Resume"}
+              </button>
+            </div>
+          )}
+
+          {autoRewriteStage === "error" && (
+            <div className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5">
+              <AlertCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+              <p className="text-xs text-muted-foreground">{autoRewriteError}</p>
+            </div>
+          )}
+
+          {autoRewrite && (
+            <RewrittenResumeView
+              profile={autoRewrite.profile}
+              jobTitle={result.jobTitle}
+              jobCompany={result.jobCompany}
+              appliedCount={autoRewrite.appliedCount}
+              unresolved={autoRewrite.unresolved}
+              onClose={() => setAutoRewrite(null)}
+            />
+          )}
 
           {/* Global actions */}
           {pendingCount > 0 && (

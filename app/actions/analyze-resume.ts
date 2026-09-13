@@ -235,9 +235,11 @@ export async function analyzeResume(
     const analyzed = await analyzeResumeText(String(resume.extracted_text));
 
     // ── DEBUG: Log analysis success ──
+    // Deliberately no PII here (no name, email, etc.) — dev-console output
+    // can end up in shared terminals, screen recordings, or support
+    // tickets, so it gets the same treatment as a production log.
     if (process.env.NODE_ENV !== "production") {
       console.log("[DEBUG analyzeResume] Analysis SUCCESS, model:", analyzed.model);
-      console.log("  profile.fullName:", analyzed.profile.fullName);
       console.log("  profile.skills:", analyzed.profile.skills.length);
     }
 
