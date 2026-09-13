@@ -9,3 +9,5 @@ export { SectionCard } from "./section-card";
 export { EmptyState } from "./empty-state";
 export { UploadZone } from "./upload-zone";
 export { ProgressBar } from "./progress-bar";
+export { AnimatedNumber } from "./animated-number";
+export { ConfettiBurst } from "./confetti-burst";

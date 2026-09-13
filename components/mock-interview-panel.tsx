@@ -237,9 +237,9 @@ export function MockInterviewPanel() {
                 type="button"
                 onClick={() => setInterviewType(opt.value)}
                 className={cn(
-                  "rounded-lg border px-3 py-2.5 text-left transition-colors",
+                  "rounded-lg border px-3 py-2.5 text-left transition-all duration-200 active:scale-[0.98]",
                   interviewType === opt.value
-                    ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
+                    ? "border-primary/40 bg-primary/5 shadow-sm ring-1 ring-primary/20"
                     : "border-border hover:bg-muted/60"
                 )}
               >
@@ -260,9 +260,9 @@ export function MockInterviewPanel() {
                 type="button"
                 onClick={() => setDifficulty(opt.value)}
                 className={cn(
-                  "flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
+                  "flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-[0.98]",
                   difficulty === opt.value
-                    ? "border-primary/40 bg-primary/5 text-primary ring-1 ring-primary/20"
+                    ? "border-primary/40 bg-primary/5 text-primary shadow-sm ring-1 ring-primary/20"
                     : "border-border text-muted-foreground hover:bg-muted/60"
                 )}
               >
@@ -282,9 +282,9 @@ export function MockInterviewPanel() {
                 type="button"
                 onClick={() => setQuestionCount(count)}
                 className={cn(
-                  "flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
+                  "flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-[0.98]",
                   questionCount === count
-                    ? "border-primary/40 bg-primary/5 text-primary ring-1 ring-primary/20"
+                    ? "border-primary/40 bg-primary/5 text-primary shadow-sm ring-1 ring-primary/20"
                     : "border-border text-muted-foreground hover:bg-muted/60"
                 )}
               >
@@ -408,7 +408,7 @@ export function MockInterviewPanel() {
         {history.length > 0 && (
           <div className="max-h-72 space-y-3 overflow-y-auto rounded-lg border border-border bg-muted/20 p-3">
             {history.map((q) => (
-              <div key={q.number} className="space-y-1.5">
+              <div key={q.number} className="animate-in fade-in slide-in-from-bottom-1 duration-300 space-y-1.5">
                 <div className="flex items-start gap-2">
                   <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10">
                     <MessagesSquare className="size-3 text-primary" />
@@ -424,11 +424,26 @@ export function MockInterviewPanel() {
                 </div>
               </div>
             ))}
+            {submitting && (
+              <div className="flex items-start gap-2">
+                <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <MessagesSquare className="size-3 text-primary" />
+                </div>
+                <div className="flex items-center gap-1 rounded-lg rounded-tl-none bg-card px-3 py-2.5 shadow-sm ring-1 ring-border">
+                  <span className="size-1.5 animate-bounce rounded-full bg-primary/50 [animation-delay:-0.3s]" />
+                  <span className="size-1.5 animate-bounce rounded-full bg-primary/50 [animation-delay:-0.15s]" />
+                  <span className="size-1.5 animate-bounce rounded-full bg-primary/50" />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Current question */}
-        <Card className="border-primary/30 bg-primary/[0.02]">
+        <Card
+          key={current.number}
+          className="animate-in fade-in slide-in-from-bottom-2 duration-300 border-primary/30 bg-primary/[0.02]"
+        >
           <CardContent className="space-y-3 py-4">
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-[10px] capitalize">

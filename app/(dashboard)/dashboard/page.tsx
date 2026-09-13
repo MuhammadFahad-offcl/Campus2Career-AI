@@ -55,10 +55,10 @@ function WelcomeState() {
         action={{ label: "Upload Resume", href: "/analysis" }}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="hover:border-primary/20 transition-colors">
+      <div className="stagger-children grid gap-4 lg:grid-cols-2">
+        <Card className="card-interactive animate-in fade-in slide-in-from-bottom-2 duration-500 hover:border-primary/20">
           <CardContent className="flex items-center gap-4 py-5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-sm">
               <Target className="size-5 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
@@ -76,10 +76,10 @@ function WelcomeState() {
             </Link>
           </CardContent>
         </Card>
-        <Card className="hover:border-primary/20 transition-colors">
+        <Card className="card-interactive animate-in fade-in slide-in-from-bottom-2 duration-500 hover:border-primary/20">
           <CardContent className="flex items-center gap-4 py-5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-              <Sparkles className="size-5 text-primary" />
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 shadow-sm">
+              <Sparkles className="size-5 text-accent" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-foreground">Skill Bridge</p>
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
               {/* ─── What is missing? ─── */}
               <section>
                 <SectionLabel>Match &amp; Gaps</SectionLabel>
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="stagger-children grid gap-4 lg:grid-cols-2">
                   <MatchOverviewCard
                     match={result.summary.match}
                     analyzedAt={result.summary.targetRole?.analyzedAt ?? null}
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
               {/* ─── What should I do next? ─── */}
               <section>
                 <SectionLabel>Plan &amp; Optimize</SectionLabel>
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="stagger-children grid gap-4 lg:grid-cols-2">
                   <SkillBridgeCard bridge={result.summary.skillBridge} />
                   <RewriteCard rewrite={result.summary.rewrite} />
                 </div>

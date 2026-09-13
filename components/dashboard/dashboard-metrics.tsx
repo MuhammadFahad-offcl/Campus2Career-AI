@@ -8,9 +8,7 @@ import type { DashboardSummary } from "@/types";
  * never a fabricated number.
  */
 export function DashboardMetrics({ summary }: { summary: DashboardSummary }) {
-  const matchValue = summary.match
-    ? `${Math.round(summary.match.score.overall)}%`
-    : "—";
+  const matchValue = summary.match ? Math.round(summary.match.score.overall) : "—";
   const coverageValue = summary.skills
     ? `${summary.skills.matched}/${summary.skills.total}`
     : "—";
@@ -20,10 +18,11 @@ export function DashboardMetrics({ summary }: { summary: DashboardSummary }) {
     : "—";
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="stagger-children grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <MetricCard
         label="Match Score"
         value={matchValue}
+        suffix={summary.match ? "%" : undefined}
         icon={Target}
         accent="indigo"
         description={

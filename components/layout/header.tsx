@@ -35,7 +35,7 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
   const autoTitle = usePageTitle();
 
   return (
-    <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-border bg-white px-4 sm:px-6">
+    <header className="relative z-10 flex h-[60px] shrink-0 items-center justify-between border-b border-border bg-background px-4 shadow-soft sm:px-6">
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile hamburger — hidden at lg+ */}
         <MobileMenuTrigger />
@@ -53,14 +53,14 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
       <div className="flex items-center gap-2 shrink-0">
         {children}
         <button
-          className="relative flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="relative flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-90"
           aria-label="Notifications"
         >
           <Bell className="size-4" />
-          <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-primary ring-2 ring-white" />
+          <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-primary ring-2 ring-background" />
         </button>
         <button
-          className="hidden sm:flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="hidden sm:flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-90"
           aria-label="Search"
         >
           <Search className="size-4" />

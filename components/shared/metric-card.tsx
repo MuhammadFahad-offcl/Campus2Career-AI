@@ -6,10 +6,13 @@ import {
   CardHeader,
   CardDescription,
 } from "@/components/ui/card";
+import { AnimatedNumber } from "./animated-number";
 
 interface MetricCardProps {
   label: string;
   value: string | number;
+  /** Appended after an animated numeric value (e.g. "%"). Ignored for string values. */
+  suffix?: string;
   icon: LucideIcon;
   description?: string;
   trend?: { value: string; positive: boolean };
@@ -32,6 +35,7 @@ const accentMap = {
 export function MetricCard({
   label,
   value,
+  suffix,
   icon: Icon,
   description,
   trend,
@@ -39,7 +43,12 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   return (
-    <Card className={cn("transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevated hover:ring-primary/15", className)}>
+    <Card
+      className={cn(
+        "card-interactive animate-in fade-in slide-in-from-bottom-2 duration-500 hover:ring-primary/15",
+        className
+      )}
+    >
       <CardHeader className="flex-row items-center gap-3 pb-0">
         <div
           className={cn(
@@ -56,7 +65,11 @@ export function MetricCard({
       <CardContent>
         <div className="flex items-baseline gap-2">
           <p className="text-2xl font-bold tracking-tight text-foreground">
-            {value}
+            {typeof value === "number" ? (
+              <AnimatedNumber value={value} suffix={suffix} />
+            ) : (
+              value
+            )}
           </p>
           {trend && (
             <span

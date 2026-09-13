@@ -18,14 +18,16 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
+      <div className="mesh-blob -left-24 top-10 size-72 bg-primary/25" aria-hidden="true" />
+      <div className="mesh-blob -right-20 bottom-10 size-72 bg-accent/20" aria-hidden="true" />
+      <div className="relative w-full max-w-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
         {/* Brand */}
         <div className="mb-8 flex flex-col items-center gap-2">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-primary">
+          <div className="flex size-11 items-center justify-center rounded-xl gradient-primary shadow-glow-primary">
             <Zap className="size-5 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="gradient-text-primary text-xl font-bold tracking-tight">
             Campus2Career AI
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -33,7 +35,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <Card>
+        <Card className="shadow-elevated">
           <CardHeader className="text-center">
             <CardTitle className="text-lg">Create your account</CardTitle>
             <CardDescription>

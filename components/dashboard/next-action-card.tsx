@@ -11,10 +11,11 @@ import type { DashboardNextAction } from "@/types";
  */
 export function NextActionCard({ action }: { action: DashboardNextAction }) {
   return (
-    <Card className="group relative overflow-hidden hover:border-primary/25 transition-all duration-200">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.04] to-transparent" />
+    <Card className="animate-in fade-in slide-in-from-bottom-2 duration-500 group relative overflow-hidden hover:border-primary/25 hover:shadow-elevated transition-all duration-200">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.06] to-transparent" />
+      <div className="mesh-blob -right-6 -top-10 size-32 bg-accent/20" aria-hidden="true" />
       <CardContent className="relative flex flex-col items-start gap-4 py-5 sm:flex-row sm:items-center">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-sm">
           <Compass className="size-5 text-primary" />
         </div>
         <div className="min-w-0 flex-1">

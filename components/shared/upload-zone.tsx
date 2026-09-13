@@ -69,9 +69,9 @@ export function UploadZone({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 sm:px-8 sm:py-12 transition-all",
+          "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 sm:px-8 sm:py-12 transition-all duration-200",
           isDragging
-            ? "border-primary bg-primary/5"
+            ? "border-primary bg-primary/5 shadow-glow-primary scale-[1.01]"
             : "border-border hover:border-primary/40 hover:bg-muted/50"
         )}
       >
@@ -83,8 +83,8 @@ export function UploadZone({
         />
         <div
           className={cn(
-            "mb-4 flex size-14 items-center justify-center rounded-2xl transition-colors",
-            isDragging ? "bg-primary/15" : "bg-primary/8"
+            "mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 transition-all duration-200",
+            isDragging && "scale-110 from-primary/30 to-primary/10"
           )}
         >
           <Upload className="size-6 text-primary" />
@@ -101,7 +101,7 @@ export function UploadZone({
       </label>
 
       {selectedFile && (
-        <div className="mt-3 flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+        <div className="animate-in fade-in slide-in-from-bottom-1 duration-300 mt-3 flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 shadow-soft">
           <FileText className="size-5 shrink-0 text-primary" />
           <div className="flex-1 min-w-0">
             <p className="truncate text-sm font-medium text-foreground">

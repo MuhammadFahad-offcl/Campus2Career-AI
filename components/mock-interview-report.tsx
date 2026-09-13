@@ -15,7 +15,7 @@ import type { InterviewSession } from "@/types";
 import { correlationSentence } from "@/lib/interview/session-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MatchScoreGauge } from "@/components/shared";
+import { AnimatedNumber, ConfettiBurst, MatchScoreGauge } from "@/components/shared";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -57,11 +57,13 @@ export function MockInterviewReport({ session, jobTitle, jobCompany, onRetake }:
   const [showTranscript, setShowTranscript] = useState(false);
   const overall = session.overallScore ?? 0;
   const breakdown = session.scoreBreakdown;
+  const celebrate = overall >= 70;
 
   return (
-    <div className="space-y-4">
+    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-4">
+      {celebrate && <ConfettiBurst triggerKey={session.id} />}
       {/* Score header */}
-      <Card>
+      <Card className="gradient-primary-soft">
         <CardHeader>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
             <MatchScoreGauge score={overall} size="lg" label="Interview Readiness" />
@@ -71,7 +73,7 @@ export function MockInterviewReport({ session, jobTitle, jobCompany, onRetake }:
                 {jobCompany && <span className="text-muted-foreground"> · {jobCompany}</span>}
               </CardTitle>
               <p className={cn("text-sm font-semibold mt-0.5", getScoreColor(overall))}>
-                {overall}/100 — {getReadinessLabel(overall)}
+                <AnimatedNumber value={overall} />/100 — {getReadinessLabel(overall)}
               </p>
               <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
                 <Badge variant="secondary" className="text-[10px] capitalize">

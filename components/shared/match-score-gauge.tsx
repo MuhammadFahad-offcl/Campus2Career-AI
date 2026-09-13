@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { AnimatedNumber } from "./animated-number";
 
 interface MatchScoreGaugeProps {
   score: number; // 0-100
@@ -80,7 +81,7 @@ export function MatchScoreGauge({ score, size = "default", label, className }: M
           />
         </svg>
         <span className={cn("absolute font-bold tracking-tight", s.fontSize, getScoreColor(clampedScore))}>
-          {clampedScore}
+          <AnimatedNumber value={clampedScore} />
         </span>
       </div>
       {label && (
