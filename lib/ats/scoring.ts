@@ -206,7 +206,7 @@ function scoreStructure(
 
   const hasName =
     (profile?.fullName?.trim().length ?? 0) > 0 ||
-    text.trim().split("\n")[0]?.trim().length! > 0;
+    (text.trim().split("\n")[0]?.trim().length ?? 0) > 0;
   if (hasName) contactScore += 5;
 
   // Logical order (max 20)

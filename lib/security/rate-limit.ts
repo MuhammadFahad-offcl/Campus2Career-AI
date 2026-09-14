@@ -1,26 +1,31 @@
 /**
- * Lightweight in-memory rate limiter for Next.js Server Actions.
+ * Rate limiter for Next.js Server Actions.
  *
  * Protects expensive operations (OpenAI calls, Supabase writes) from
  * per-identity abuse.
  *
- * ⚠ Known MVP limitation (accepted for the hackathon, DAY 3C audit):
- * - Single-instance only. Buckets live in process memory, so every
- *   server instance / serverless cold start gets its own independent
- *   buckets — with N instances the effective limit is N× the configured
- *   one, and memory resets on every restart or cold start.
- * - No cross-instance coordination (deliberately no Redis for the MVP).
- * - Identity for anonymous callers is the session cookie; rotating the
- *   cookie yields a fresh bucket.
+ * ── Production fix (2026-09-14 production-readiness audit) ──────────
+ * The original implementation kept buckets in process memory, which is
+ * close to meaningless on Vercel's serverless model: every invocation
+ * (and every instance) gets its own independent memory, so N instances
+ * effectively multiply the configured limit by N, and every cold start
+ * resets it to zero. The primary path now calls a Postgres function
+ * (`check_rate_limit`, migration 009) through the server-only admin
+ * client, so the bucket is shared and atomic across every instance.
  *
- * Sufficient for a single-instance demo deployment. Replace with a
- * Redis-backed (or Supabase-backed) limiter before any multi-instance
- * production rollout.
+ * If the Supabase call itself fails (misconfigured environment, a
+ * transient outage), this falls back to the original in-memory bucket
+ * rather than to "always allow" — degraded but still real protection
+ * within that one instance, and the product never goes down over a
+ * rate-limiter hiccup. The fallback is also what makes local
+ * development and the unit tests below work without any Supabase
+ * connection at all.
  *
- * NEVER logs credentials. Identifiers are hashed into opaque bucket keys.
+ * NEVER logs credentials. Identifiers are opaque bucket keys (session
+ * id / user id), never raw credentials.
  */
-
-type Bucket = { tokens: number; lastRefill: number };
+import { createAdminClient } from "@/lib/supabase/admin";
+import { logServerError } from "@/lib/observability/log-error";
 
 interface RateLimitConfig {
   /** Max requests allowed within `windowMs`. */
@@ -29,17 +34,74 @@ interface RateLimitConfig {
   windowMs: number;
 }
 
+type RateLimitResult =
+  | { allowed: true }
+  | { allowed: false; retryAfterMs: number };
+
 const DEFAULT_CONFIG: RateLimitConfig = {
   maxRequests: 10,
   windowMs: 60_000,
 };
 
+/**
+ * Check whether an identity may perform an action within the configured
+ * rate limit. Tries the shared Postgres-backed limiter first; falls back
+ * to a single-instance in-memory limiter if that call fails for any
+ * reason.
+ *
+ * @param namespace - Distinct bucket namespace per action (e.g. "upload", "analyze").
+ * @param identity  - Opaque caller identifier (session id, user id, or IP hash).
+ *                    Must never contain raw credentials.
+ */
+export async function checkRateLimit(
+  namespace: string,
+  identity: string,
+  config: RateLimitConfig = DEFAULT_CONFIG
+): Promise<RateLimitResult> {
+  if (!identity) {
+    // Unknown identity — deny by default to avoid silent bypass.
+    return { allowed: false, retryAfterMs: config.windowMs };
+  }
+
+  const bucketKey = `${namespace}:${identity}`;
+
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      p_bucket_key: bucketKey,
+      p_max_requests: config.maxRequests,
+      p_window_ms: config.windowMs,
+    });
+
+    if (error) throw error;
+
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) throw new Error("check_rate_limit returned no row");
+
+    if (row.allowed) return { allowed: true };
+    return {
+      allowed: false,
+      retryAfterMs: Number(row.retry_after_ms) || config.windowMs,
+    };
+  } catch (err) {
+    // Degrade to the in-memory limiter rather than fail open entirely.
+    // Logged (best-effort) so a persistent Supabase problem is visible
+    // instead of silently degrading rate-limit quality forever.
+    void logServerError("rate-limit", err, {
+      context: { namespace, degradedMode: "in-memory-fallback" },
+    });
+    return checkRateLimitInMemory(bucketKey, config);
+  }
+}
+
+// ────────────────────────────────────────────────
+// In-memory fallback (single instance only)
+// ────────────────────────────────────────────────
+
+type Bucket = { tokens: number; lastRefill: number };
+
 const buckets = new Map<string, Bucket>();
 
-/**
- * Periodic cleanup of stale buckets to prevent unbounded memory growth.
- * Runs once every 5 minutes, evicting entries not touched in the last hour.
- */
 let cleanupScheduled = false;
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 const STALE_BUCKET_MS = 60 * 60 * 1000;
@@ -57,45 +119,31 @@ function scheduleCleanup() {
   }, CLEANUP_INTERVAL_MS).unref?.();
 }
 
-/**
- * Check whether an identity may perform an action within the configured
- * rate limit. Returns `{ allowed: true }` or `{ allowed: false, retryAfterMs }`.
- *
- * @param namespace - Distinct bucket namespace per action (e.g. "upload", "analyze").
- * @param identity  - Opaque caller identifier (session id, user id, or IP hash).
- *                    Must never contain raw credentials.
- */
-export function checkRateLimit(
-  namespace: string,
-  identity: string,
-  config: RateLimitConfig = DEFAULT_CONFIG
-): { allowed: true } | { allowed: false; retryAfterMs: number } {
-  if (!identity) {
-    // Unknown identity — deny by default to avoid silent bypass.
-    return { allowed: false, retryAfterMs: config.windowMs };
-  }
-
+function checkRateLimitInMemory(
+  bucketKey: string,
+  config: RateLimitConfig
+): RateLimitResult {
   scheduleCleanup();
 
-  const key = `${namespace}:${identity}`;
   const now = Date.now();
-  const bucket = buckets.get(key) ?? { tokens: config.maxRequests, lastRefill: now };
+  const bucket = buckets.get(bucketKey) ?? {
+    tokens: config.maxRequests,
+    lastRefill: now,
+  };
 
-  // Refill tokens proportionally to elapsed time.
   const elapsed = now - bucket.lastRefill;
   const refill = (elapsed / config.windowMs) * config.maxRequests;
   bucket.tokens = Math.min(config.maxRequests, bucket.tokens + refill);
   bucket.lastRefill = now;
 
   if (bucket.tokens < 1) {
-    buckets.set(key, bucket);
-    // Approximate wait: enough time for 1 token to refill.
+    buckets.set(bucketKey, bucket);
     const retryAfterMs = Math.ceil(config.windowMs / config.maxRequests);
     return { allowed: false, retryAfterMs };
   }
 
   bucket.tokens -= 1;
-  buckets.set(key, bucket);
+  buckets.set(bucketKey, bucket);
   return { allowed: true };
 }
 

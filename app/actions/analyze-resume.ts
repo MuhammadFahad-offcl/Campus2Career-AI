@@ -11,6 +11,7 @@ import {
 } from "@/lib/ai";
 import { candidateProfileSchema } from "@/schemas";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import type { CandidateProfile } from "@/types";
 
 export type AnalyzeResumeErrorCode =
@@ -199,7 +200,7 @@ export async function analyzeResume(
     owner.kind === "authenticated"
       ? owner.userId
       : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit(
+  const rateCheck = await checkRateLimit(
     "analyze",
     rateLimitIdentity ?? "unknown",
     RATE_LIMITS.analyze
@@ -288,6 +289,12 @@ export async function analyzeResume(
       err instanceof ResumeAnalyzerError
         ? err
         : new ResumeAnalyzerError("AI analysis failed.", "OPENAI_FAILURE");
+
+    void logServerError("analyzeResume", analyzerError, {
+      ownerType: owner.kind,
+      errorCode: analyzerError.code,
+      context: { resumeId },
+    });
 
     const failedQuery = supabase
       .from("resumes")

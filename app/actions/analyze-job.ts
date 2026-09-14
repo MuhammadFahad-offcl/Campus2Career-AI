@@ -9,6 +9,7 @@ import {
   JobAnalyzerError,
 } from "@/lib/ai";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import type { JobTarget } from "@/types";
 
 export type AnalyzeJobErrorCode =
@@ -257,7 +258,7 @@ export async function analyzeJob(
     owner.kind === "authenticated"
       ? owner.userId
       : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit(
+  const rateCheck = await checkRateLimit(
     "analyzeJob",
     rateLimitIdentity ?? "unknown",
     RATE_LIMITS.analyzeJob
@@ -353,6 +354,11 @@ export async function analyzeJob(
       err instanceof JobAnalyzerError
         ? err
         : new JobAnalyzerError("AI analysis failed.", "OPENAI_FAILURE");
+
+    void logServerError("analyzeJob", analyzerError, {
+      ownerType: owner.kind,
+      errorCode: analyzerError.code,
+    });
 
     return mapAnalyzerError(analyzerError);
   }

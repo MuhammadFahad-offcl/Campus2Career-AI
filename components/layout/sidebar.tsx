@@ -8,12 +8,18 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Zap, ChevronRight, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Zap, ChevronRight, Menu, X, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mainNav, type NavItem } from "@/lib/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { signOutAction } from "@/app/actions/auth";
+
+export interface SidebarIdentity {
+  email: string | null;
+  isAuthenticated: boolean;
+}
 
 // ────────────────────────────────────────────────
 // Mobile navigation context
@@ -126,8 +132,32 @@ function SidebarNavItem({ item }: { item: NavItem }) {
 // Sidebar inner content (unchanged desktop rendering)
 // ────────────────────────────────────────────────
 
-function SidebarContent() {
+function initials(email: string | null): string {
+  if (!email) return "S2C";
+  const local = email.split("@")[0] ?? "";
+  const parts = local.split(/[._-]/).filter(Boolean);
+  const chars = parts.length >= 2
+    ? [parts[0][0], parts[1][0]]
+    : [local.slice(0, 2)];
+  return chars.join("").toUpperCase().slice(0, 2) || "S2C";
+}
+
+function SidebarContent({ identity }: { identity: SidebarIdentity }) {
   const { close } = useMobileNav();
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = useCallback(async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOutAction();
+    } finally {
+      setSigningOut(false);
+      router.push("/");
+      router.refresh();
+    }
+  }, [signingOut, router]);
 
   return (
     <aside className="flex h-full w-[260px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
@@ -175,17 +205,35 @@ function SidebarContent() {
         <div className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/60">
           <Avatar className="size-8">
             <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/15 text-[11px] font-bold text-primary">
-              SC
+              {initials(identity.email)}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-1 flex-col min-w-0">
             <span className="truncate text-[13px] font-medium text-foreground">
-              Student User
+              {identity.isAuthenticated ? identity.email : "Anonymous session"}
             </span>
             <span className="truncate text-[11px] text-muted-foreground">
-              Free Plan
+              {identity.isAuthenticated ? "Signed in" : "Not saved — sign up to keep your work"}
             </span>
           </div>
+          {identity.isAuthenticated ? (
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              aria-label="Sign out"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+            >
+              <LogOut className="size-3.5" />
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              onClick={close}
+              className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </aside>
@@ -203,14 +251,14 @@ function SidebarContent() {
  * Mobile (< lg): Off-screen drawer that slides in from the left with a
  *   backdrop overlay. Controlled via MobileNavContext.
  */
-export function Sidebar() {
+export function Sidebar({ identity }: { identity: SidebarIdentity }) {
   const { isOpen, close } = useMobileNav();
 
   return (
     <>
       {/* ── Desktop: unchanged persistent sidebar ─────────── */}
       <div className="hidden lg:block">
-        <SidebarContent />
+        <SidebarContent identity={identity} />
       </div>
 
       {/* ── Mobile: slide-in drawer + overlay ─────────────── */}
@@ -225,7 +273,7 @@ export function Sidebar() {
 
           {/* Drawer panel */}
           <div className="fixed inset-y-0 left-0 z-50">
-            <SidebarContent />
+            <SidebarContent identity={identity} />
           </div>
         </div>
       )}

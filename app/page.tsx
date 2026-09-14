@@ -344,7 +344,21 @@ export default function LandingPage() {
               &copy; 2026 Campus2Career AI
             </span>
           </div>
-          <p className="text-[11px] text-muted-foreground/60">MVP v0.1 &middot; Built for students</p>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/privacy"
+              className="text-[11px] text-muted-foreground/60 hover:text-foreground"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-[11px] text-muted-foreground/60 hover:text-foreground"
+            >
+              Terms
+            </Link>
+            <p className="text-[11px] text-muted-foreground/60">MVP v0.1 &middot; Built for students</p>
+          </div>
         </div>
       </footer>
     </div>

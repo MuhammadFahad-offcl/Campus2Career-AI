@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Zap } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = {
   title: "Sign Up",
@@ -43,17 +42,9 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-center text-sm text-muted-foreground">
-              Registration will be available once Supabase Auth is configured.
-            </p>
+            <RegisterForm />
           </CardContent>
           <CardFooter className="flex-col gap-3">
-            <Link
-              href="/dashboard"
-              className={cn(buttonVariants({ size: "sm" }), "w-full justify-center")}
-            >
-              Continue to Dashboard
-            </Link>
             <p className="text-xs text-muted-foreground">
               Already have an account?{" "}
               <Link
@@ -63,6 +54,12 @@ export default function RegisterPage() {
                 Sign in
               </Link>
             </p>
+            <Link
+              href="/dashboard"
+              className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+            >
+              Continue without an account
+            </Link>
           </CardFooter>
         </Card>
       </div>

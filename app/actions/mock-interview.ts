@@ -26,6 +26,7 @@ import {
 } from "@/lib/ai";
 import { candidateProfileSchema, interviewQuestionSchema, interviewSessionSchema } from "@/schemas";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import {
   buildFocusAreas,
   calculateOverallScore,
@@ -323,7 +324,7 @@ export async function startInterviewSession(options: {
 
   const rateLimitIdentity =
     owner.kind === "authenticated" ? owner.userId : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit("mockInterviewStart", rateLimitIdentity ?? "unknown", RATE_LIMITS.mockInterviewStart);
+  const rateCheck = await checkRateLimit("mockInterviewStart", rateLimitIdentity ?? "unknown", RATE_LIMITS.mockInterviewStart);
   if (!rateCheck.allowed) {
     return failure("RATE_LIMITED", "Too many interview starts. Please wait a moment and try again.");
   }
@@ -368,9 +369,11 @@ export async function startInterviewSession(options: {
   } catch (err) {
     if (err instanceof InterviewGeneratorError) {
       console.error("[startInterviewSession] AI failure:", err.code, err.message);
+      void logServerError("startInterviewSession", err, { errorCode: err.code });
       return failure("AI_FAILURE", err.message);
     }
     console.error("[startInterviewSession] Unexpected error:", err);
+    void logServerError("startInterviewSession", err, { errorCode: "UNKNOWN" });
     return failure("UNKNOWN", "An unexpected error occurred. Please try again.");
   }
 
@@ -456,7 +459,7 @@ export async function submitAnswerAction(
 
   const rateLimitIdentity =
     owner.kind === "authenticated" ? owner.userId : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit("mockInterviewTurn", rateLimitIdentity ?? "unknown", RATE_LIMITS.mockInterviewTurn);
+  const rateCheck = await checkRateLimit("mockInterviewTurn", rateLimitIdentity ?? "unknown", RATE_LIMITS.mockInterviewTurn);
   if (!rateCheck.allowed) {
     return failure("RATE_LIMITED", "You're answering too quickly. Please wait a moment and try again.");
   }
@@ -522,9 +525,11 @@ export async function submitAnswerAction(
   } catch (err) {
     if (err instanceof InterviewGeneratorError) {
       console.error("[submitAnswer] AI failure:", err.code, err.message);
+      void logServerError("submitInterviewAnswer", err, { errorCode: err.code });
       return failure("AI_FAILURE", err.message);
     }
     console.error("[submitAnswer] Unexpected error:", err);
+    void logServerError("submitInterviewAnswer", err, { errorCode: "UNKNOWN" });
     return failure("UNKNOWN", "An unexpected error occurred. Please try again.");
   }
 

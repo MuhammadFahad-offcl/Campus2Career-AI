@@ -7,6 +7,7 @@ import { type ResumeOwner } from "@/lib/resume-ownership";
 import { generateSkillBridge, SkillBridgeGeneratorError } from "@/lib/ai";
 import { candidateProfileSchema, skillBridgePlanSchema } from "@/schemas";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import type {
   DayTaskStatus,
   JobTarget,
@@ -312,7 +313,7 @@ export async function generateSkillBridgeAction(options?: {
     owner.kind === "authenticated"
       ? owner.userId
       : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit(
+  const rateCheck = await checkRateLimit(
     "skillBridge",
     rateLimitIdentity ?? "unknown",
     RATE_LIMITS.skillBridge
@@ -416,9 +417,11 @@ export async function generateSkillBridgeAction(options?: {
           "No skill gaps found for this job — a skill bridge plan is not needed."
         );
       }
+      void logServerError("generateSkillBridge", err, { errorCode: err.code });
       return failure("AI_FAILURE", err.message);
     }
     console.error("[generateSkillBridge] Unexpected error:", err);
+    void logServerError("generateSkillBridge", err, { errorCode: "UNKNOWN" });
     return failure("UNKNOWN", "An unexpected error occurred. Please try again.");
   }
 

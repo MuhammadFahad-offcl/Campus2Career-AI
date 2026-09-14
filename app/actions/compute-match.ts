@@ -7,6 +7,7 @@ import { type ResumeOwner } from "@/lib/resume-ownership";
 import { computeMatch } from "@/lib/scoring";
 import { candidateProfileSchema } from "@/schemas";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import type {
   CandidateProfile,
   JobTarget,
@@ -202,6 +203,7 @@ export async function computeMatchAction(
     context = await getAnalysisContext();
   } catch (err) {
     console.error("[computeMatch] Context failed:", err);
+    void logServerError("computeMatchAction", err, { errorCode: "CONFIGURATION_ERROR" });
     return failure("CONFIGURATION_ERROR", "Analysis is not configured.");
   }
 
@@ -219,7 +221,7 @@ export async function computeMatchAction(
     owner.kind === "authenticated"
       ? owner.userId
       : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit(
+  const rateCheck = await checkRateLimit(
     "computeMatch",
     rateLimitIdentity ?? "unknown",
     RATE_LIMITS.computeMatch

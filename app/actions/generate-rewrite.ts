@@ -7,6 +7,7 @@ import { type ResumeOwner } from "@/lib/resume-ownership";
 import { rewriteResume, RewriteAnalyzerError } from "@/lib/ai";
 import { candidateProfileSchema } from "@/schemas";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import type {
   CandidateProfile,
   JobTarget,
@@ -173,7 +174,7 @@ export async function generateRewrite(
     owner.kind === "authenticated"
       ? owner.userId
       : (await getAnonymousSessionId()) ?? owner.anonymousSessionId;
-  const rateCheck = checkRateLimit(
+  const rateCheck = await checkRateLimit(
     "rewrite",
     rateLimitIdentity ?? "unknown",
     RATE_LIMITS.rewrite
@@ -278,9 +279,11 @@ export async function generateRewrite(
   } catch (err) {
     if (err instanceof RewriteAnalyzerError) {
       console.error("[generateRewrite] AI failure:", err.code, err.message);
+      void logServerError("generateRewrite", err, { errorCode: err.code });
       return failure("AI_FAILURE", err.message);
     }
     console.error("[generateRewrite] Unexpected error:", err);
+    void logServerError("generateRewrite", err, { errorCode: "UNKNOWN" });
     return failure("UNKNOWN", "An unexpected error occurred during rewrite.");
   }
 

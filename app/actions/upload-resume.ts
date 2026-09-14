@@ -28,6 +28,7 @@ import {
   ACCEPTED_RESUME_FORMATS,
 } from "@/schemas";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
+import { logServerError } from "@/lib/observability/log-error";
 import { assertMagicBytesMatch } from "@/lib/security/file-signatures";
 import type { DocumentFormat } from "@/types";
 
@@ -158,7 +159,7 @@ export async function uploadAndProcessResume(file: File): Promise<UploadResult> 
     console.error("[uploadAndProcessResume] Rate-limit identity resolution failed:", err);
   }
 
-  const rateCheck = checkRateLimit("upload", rateLimitIdentity ?? "unknown", RATE_LIMITS.upload);
+  const rateCheck = await checkRateLimit("upload", rateLimitIdentity ?? "unknown", RATE_LIMITS.upload);
   if (!rateCheck.allowed) {
     return error(
       "RATE_LIMITED",
@@ -172,6 +173,7 @@ export async function uploadAndProcessResume(file: File): Promise<UploadResult> 
     context = await getUploadContext();
   } catch (err) {
     console.error("[uploadAndProcessResume] Upload context failed:", err);
+    void logServerError("uploadAndProcessResume", err, { errorCode: "CONFIGURATION_ERROR" });
     return error(
       "CONFIGURATION_ERROR",
       "Unable to upload your resume. Resume storage is not configured for this environment."
@@ -250,6 +252,11 @@ export async function uploadAndProcessResume(file: File): Promise<UploadResult> 
     const message =
       err instanceof Error ? err.message : "Text extraction failed.";
     console.error("[uploadAndProcessResume] Extraction failed:", err);
+    void logServerError("uploadAndProcessResume", err, {
+      ownerType: owner.kind,
+      errorCode: "EXTRACTION_FAILED",
+      context: { resumeId, format },
+    });
 
     const failedQuery = supabase
       .from("resumes")

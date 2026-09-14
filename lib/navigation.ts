@@ -49,8 +49,6 @@ export const mainNav: NavGroup[] = [
         label: "My Resumes",
         href: "/resumes",
         icon: FolderOpen,
-        disabled: true,
-        badge: "Soon",
       },
       {
         label: "Job Matcher",
