@@ -51,14 +51,14 @@ export const mainNav: NavGroup[] = [
         icon: FolderOpen,
       },
       {
-        label: "Job Matcher",
-        href: "/job-matcher",
-        icon: Target,
-      },
-      {
         label: "Resume Analyzer",
         href: "/analysis",
         icon: FileSearch,
+      },
+      {
+        label: "Job Matcher",
+        href: "/job-matcher",
+        icon: Target,
       },
       {
         label: "Resume Rewrite",
